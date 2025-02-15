@@ -3,55 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico" />
-    <title>>.::Portal (Login)::.</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/portal.css">
-    <script src="/static/js/portal.js"></script>
+    <title>Página com Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+            padding-top: 70px;
+        }
+        header {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f4f4f4;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        .user-name {
+            font-weight: bold;
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .auth-buttons button {
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .auth-buttons button:hover {
+            background: #0056b3;
+        }
+        main {
+            width: 80%;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .post {
+            width: 80%;
+            height: 30vh;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+            font-size: 1.2em;
+            color: #333;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .post .description {
+            flex-grow: 1;
+        }
+        .post .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .post button {
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .post button:hover {
+            background: #218838;
+        }
+    </style>
 </head>
 <body>
-    <div class= "object_centered">
-      <h1>Seja bem-vindo ao BMVCh@t!</h1>
-      <h4>Estrutura desenvolvida para oferecer suporte ao desenvolvimento FullStack da disciplina de Orientação a Objetos (Henrique Moura - 01/2024).</h4>
-      <img src="{{'static/img/BottleLogo.png'}}" alt="Descrição da Imagem"
-         width="300" height="300" onclick="displayText()">
-    </div>
-    <h1>Login</h1>
-    % if username:
-      <div class= "object_centered">
-        % if edited:
-            <h4>Usuário logado: {{ username }} (editado) </h4>
-        % else:
-            <h4>Usuário logado: {{ username }} </h4>
-        % end
-          <form action="/logout" method="post">
-              <button type="submit">Logout</button>
-          </form>
-          <form action="/edit" method="get">
-              <button type="submit">Área de usuário</button>
-          </form>
-          <form action="/chat" method="get">
-              <button type="submit">Área de mensagens</button>
-          </form>
-      </div>
-    % else:
-        % if removed is not None:
-            <h4>O usuário {{ removed }} foi removido deste cadastro.</h4>
-        % elif created is not None:
-            <h4>O usuário {{ created }} foi criado neste cadastro.</h4>
-        % end
-        <div class= "object_centered">
-          <form action="/portal" method="post">
-              <label for="username">Nome:</label>
-              <input id="username" name="username" type="text" required /><br>
-              <label for="password">Senha:</label>
-              <input id="password" name="password" type="password" required /><br>
-              </br>
-              <input id="setUsers" value="Login" type="submit" />
-          </form>
-          <form action="/create" method="get">
-              <button type="submit">Criar conta de usuário</button>
-          </form>
+    <header>
+        <div class="user-name">{{ current_user.username if current_user else 'Guest' }}</div>
+        <div class="auth-buttons">
+            <form action="/login" method="get">
+                <button aria-label="Fazer Login">Login</button>
+            </form>
+            <form action="/create" method="get">
+                <button aria-label="Criar Conta">Criar Conta</button>
+            </form>
         </div>
-    % end
+    </header>
+    <main id="content">
+        <div class="post">
+            <div class="description">Descrição do Trabalho</div>
+            <div class="actions">
+                <form action="/email" method="get">
+                    <button aria-label="Enviar Email">Enviar Email</button>
+                </form>
+                <form action="/proposta" method="post">
+                    <button aria-label="Aceitar Proposta">Aceitar Proposta</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        let page = 1;
+
+        function createPost() {
+            const post = document.createElement('div');
+            post.classList.add('post');
+            post.innerHTML = `
+                <div class="description">Descrição do Trabalho</div>
+                <div class="actions">
+                    <form action="/email" method="get">
+                        <button aria-label="Enviar Email">Enviar Email</button>
+                    </form>
+                    <form action="/proposta" method="post">
+                        <button aria-label="Aceitar Proposta">Aceitar Proposta</button>
+                    </form>
+                </div>
+            `;
+            document.getElementById('content').appendChild(post);
+        }
+
+        for (let i = 0; i < 5; i++) {
+            createPost();
+        }
+
+        function checkScroll() {
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 5) {
+                page++;
+                for (let i = 0; i < 5; i++) {
+                    createPost();
+                }
+            }
+        }
+
+        // Adiciona o evento de rolagem
+        window.addEventListener('scroll', checkScroll);
+    </script>
 </body>
 </html>
+
