@@ -62,6 +62,10 @@ class Application:
             email = request.form.get('email')
             self.insert_user(username, password, email)
             return self.render('portal')
+
+        @self.app.route('/login', method='GET')
+        def login_getter():
+            return self.render('login')
             
         @self.app.route('/login', method='POST')
         def login_action():
