@@ -63,16 +63,22 @@ class Application:
             self.insert_user(username, password, email)
             return self.render('portal')
             
-        @self.app.route('/login', method='GET')
+        @self.app.route('/login', method='POST')
         def login_getter():
             username = request.forms.get('username')
             password = request.forms.get('password')
             self.authenticate_user(username, password)
+            return template('app/views/html/login')
 
         @self.app.route('/logout', method='POST')
         def logout_action():
             self.logout_user()
             return self.render('portal')
+        
+        @self.app.route('/email', method='GET')
+        def send_email():
+            mailto_link = f"mailto:{request.forms.get('email')}"
+            redirect(mailto_link)
 
     # método controlador de acesso às páginas:
     def render(self, page, parameter=None):
@@ -104,8 +110,8 @@ class Application:
         
     def login(self):
         current_user = self.getCurrentUserBySessionId()
-        if current_user:
-            redirect('/portal')
+        #if current_user:
+            #redirect('/portal')
         username = request.forms.get('username')
         password = request.forms.get('password')
         if username and password:
@@ -117,7 +123,6 @@ class Application:
                 error_message = "Invalid username or password"
                 return template('app/views/html/login', error_message=error_message)
         return template('app/views/html/login')
-        
         
     def portal(self):
         current_user = self.getCurrentUserBySessionId()
@@ -131,7 +136,6 @@ class Application:
         self.removed = None
         self.created = None
         return portal_render
-
 
     def pagina(self):
         self.update_users_list()
